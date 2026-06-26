@@ -34,7 +34,8 @@ const playlist = {
   },
 };
 
-const DEFAULT_ID = 'hit-001';
+// HATA DÜZELTİLDİ: Başlangıç ID'si listedeki ilk geçerli şifreli anahtara ayarlandı
+const DEFAULT_ID = '8f2c91a4b6d0e3f5'; 
 const TONEARM_REST = -18;
 const TONEARM_PLAY = 25;
 const ARM_DURATION = 1.2;
@@ -67,9 +68,8 @@ function parseYoutubeId(input) {
   return match ? match[1] : null;
 }
 
-// HATA DÜZELTİLDİ: Statik metin yerine parametre olan 'id' kullanıldı
 function coverFromYoutube(id) {
-  return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`; // maxresdefault daha kalitelidir
+  return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
 }
 
 function resolveTrackId() {
@@ -87,7 +87,6 @@ function loadTrack(id) {
   const track = playlist[id];
   if (!track) return;
 
-  // Sayfa ilk açılışta oynatıcı hazır değilken durdurma komutunun hata fırlatmasını önlemek için guard eklendi
   if (ytReady) {
     stopPlayback(true);
   }
@@ -157,7 +156,6 @@ function pauseYoutube() {
 function startPlayback() {
   if (!currentVideoId) return;
   
-  // Önce iğne plağın üzerine gelsin, animasyon bitince müzik başlasın (Plak deneyimi için)
   animateTonearm(TONEARM_PLAY, () => {
     playYoutube(currentVideoId);
   });
@@ -202,7 +200,6 @@ function onPlayerStateChange(event) {
     setPlayingUI(true);
   }
 
-  // HATA DÜZELTİLDİ: PAUSED durumu sonsuz döngüyü engellemek için kaldırıldı, sadece şarkı bittiğinde tetiklenecek.
   if (event.data === YT.PlayerState.ENDED) {
     stopPlayback();
   }
@@ -246,7 +243,6 @@ function init() {
   gsap.set(tonearm, { rotation: TONEARM_REST, transformOrigin: '50% 8%' });
 
   const id = resolveTrackId();
-  // HATA DÜZELTİLDİ: loadTrack öncesi başlangıç ID senkronizasyonu sağlandı
   currentId = id; 
   loadTrack(id);
 
@@ -260,5 +256,4 @@ function init() {
   initYouTube();
 }
 
-// Başlatıcı
 init();

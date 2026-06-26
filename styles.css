@@ -1,0 +1,176 @@
+/* ── Base & shell ─────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #111726 0%, #07090e 100%);
+  color: #fff;
+  overflow-x: hidden;
+}
+
+.app-shell {
+  transition: background 0.8s ease;
+}
+
+.safe-area {
+  padding-bottom: max(2rem, env(safe-area-inset-bottom));
+  padding-top: max(2rem, env(safe-area-inset-top));
+}
+
+/* ── Turntable base (neumorphic) ──────────────────────────── */
+.turntable-base {
+  background: linear-gradient(145deg, #161b26 0%, #0d1018 100%);
+  border-radius: 1.25rem;
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.55),
+    0 8px 16px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Platter ring ─────────────────────────────────────────── */
+.platter-ring {
+  background: radial-gradient(circle at 50% 45%, #2a3140 0%, #141820 70%, #0a0c12 100%);
+  box-shadow:
+    inset 0 2px 6px rgba(255, 255, 255, 0.04),
+    inset 0 -4px 12px rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Vinyl disc ───────────────────────────────────────────── */
+.vinyl-disc {
+  background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0a0a0a 55%, #050505 100%);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.vinyl-disc.spinning {
+  animation: spin 1.8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg) translateZ(0); }
+  to   { transform: rotate(360deg) translateZ(0); }
+}
+
+/* Concentric grooves via repeating radial gradient */
+.vinyl-grooves {
+  background: repeating-radial-gradient(
+    circle at 50% 50%,
+    transparent 0px,
+    transparent 1.5px,
+    rgba(255, 255, 255, 0.018) 1.5px,
+    rgba(255, 255, 255, 0.018) 2.5px,
+    transparent 2.5px,
+    transparent 4px
+  );
+  opacity: 0.9;
+}
+
+/* Subtle light sweep */
+.vinyl-shine {
+  background: conic-gradient(
+    from 210deg,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.04) 30deg,
+    transparent 60deg,
+    transparent 360deg
+  );
+  mix-blend-mode: overlay;
+}
+
+/* Center label */
+.vinyl-label {
+  background: #111;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Spindle */
+.spindle {
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle at 35% 30%, #555 0%, #222 60%, #111 100%);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.8),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  z-index: 2;
+}
+
+/* ── Tonearm ──────────────────────────────────────────────── */
+.tonearm-pivot {
+  transform-origin: 50% 8%;
+  will-change: transform;
+  transform: rotate(-18deg) translateZ(0);
+  filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.5));
+}
+
+.tonearm-svg {
+  display: block;
+}
+
+/* ── Track info visibility ────────────────────────────────── */
+.track-info.visible #song-title,
+.track-info.visible #artist-name {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+#artist-name {
+  transition-delay: 0.08s;
+}
+
+/* ── Play button (premium neumorphic) ─────────────────────── */
+.play-btn {
+  color: #f5f0e6;
+  background: linear-gradient(145deg, #2a2520 0%, #1a1612 100%);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(201, 162, 39, 0.15);
+}
+
+.play-btn:hover {
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 20px rgba(201, 162, 39, 0.08);
+}
+
+.play-btn.is-playing {
+  background: linear-gradient(145deg, #3d2e1a 0%, #251a0e 100%);
+  border-color: rgba(201, 162, 39, 0.35);
+  color: #e8d48b;
+}
+
+.play-btn:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ── Reduced motion ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .vinyl-disc.spinning {
+    animation-duration: 3.6s;
+  }
+
+  .tonearm-pivot {
+    transition: transform 0.01s !important;
+  }
+}

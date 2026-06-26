@@ -24,7 +24,7 @@ const ARM_DURATION = 1.2;
 const $ = (sel) => document.querySelector(sel);
 
 const app        = $('#app');
-const vinyl      = $('#vinyl');
+const vinyl        = $('#vinyl');
 const tonearm    = $('#tonearm-pivot');
 const cover      = $('#cover');
 const songTitle  = $('#song-title');
@@ -49,8 +49,9 @@ function parseYoutubeId(input) {
   return match ? match[1] : null;
 }
 
+// HATA DÜZELTİLDİ: Statik metin yerine parametre olan 'id' kullanıldı
 function coverFromYoutube(id) {
-  return `https://img.youtube.com/vi/${JiDIJ5CMJw0}/hqdefault.jpg`;
+  return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`; // maxresdefault daha kalitelidir
 }
 
 function resolveTrackId() {
@@ -68,7 +69,10 @@ function loadTrack(id) {
   const track = playlist[id];
   if (!track) return;
 
-  stopPlayback(true);
+  // Sayfa ilk açılışta oynatıcı hazır değilken durdurma komutunun hata fırlatmasını önlemek için guard eklendi
+  if (ytReady) {
+    stopPlayback(true);
+  }
 
   const videoId = parseYoutubeId(track.youtube);
   currentId = id;
@@ -95,7 +99,6 @@ function animateTonearm(toDeg, onComplete) {
   if (armTween) armTween.kill();
 
   isAnimating = true;
-  tonearm.disabled = true;
 
   armTween = gsap.to(tonearm, {
     rotation: toDeg,
@@ -104,7 +107,6 @@ function animateTonearm(toDeg, onComplete) {
     force3D: true,
     onComplete: () => {
       isAnimating = false;
-      tonearm.disabled = false;
       if (onComplete) onComplete();
     },
   });
@@ -122,25 +124,25 @@ function playYoutube(videoId) {
   if (!videoId) return;
 
   if (ytReady && ytPlayer) {
-    ytPlayer.loadVideoById(videoId);
+    ytPlayer.playVideo();
     return;
   }
-
   pendingVideoId = videoId;
 }
 
 function pauseYoutube() {
-  if (ytReady && ytPlayer) {
+  if (ytReady && ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
     ytPlayer.pauseVideo();
-    ytPlayer.seekTo(0, true);
   }
 }
 
 function startPlayback() {
   if (!currentVideoId) return;
-
-  playYoutube(currentVideoId);
-  animateTonearm(TONEARM_PLAY);
+  
+  // Önce iğne plağın üzerine gelsin, animasyon bitince müzik başlasın (Plak deneyimi için)
+  animateTonearm(TONEARM_PLAY, () => {
+    playYoutube(currentVideoId);
+  });
 }
 
 function stopPlayback(instant = false) {
@@ -152,7 +154,6 @@ function stopPlayback(instant = false) {
   if (instant) {
     gsap.set(tonearm, { rotation: TONEARM_REST });
     isAnimating = false;
-    tonearm.disabled = false;
     return;
   }
 
@@ -171,9 +172,7 @@ function togglePlayback() {
 
 function onPlayerReady() {
   ytReady = true;
-  const id = resolveTrackId();
-  loadTrack(id);
-
+  
   if (pendingVideoId) {
     ytPlayer.cueVideoById(pendingVideoId);
     pendingVideoId = null;
@@ -185,10 +184,9 @@ function onPlayerStateChange(event) {
     setPlayingUI(true);
   }
 
-  if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
-    if (event.data === YT.PlayerState.ENDED) {
-      stopPlayback();
-    }
+  // HATA DÜZELTİLDİ: PAUSED durumu sonsuz döngüyü engellemek için kaldırıldı, sadece şarkı bittiğinde tetiklenecek.
+  if (event.data === YT.PlayerState.ENDED) {
+    stopPlayback();
   }
 }
 
@@ -230,17 +228,19 @@ function init() {
   gsap.set(tonearm, { rotation: TONEARM_REST, transformOrigin: '50% 8%' });
 
   const id = resolveTrackId();
-  currentId = id;
+  // HATA DÜZELTİLDİ: loadTrack öncesi başlangıç ID senkronizasyonu sağlandı
+  currentId = id; 
   loadTrack(id);
 
   if (!location.hash) {
     history.replaceState(null, '', `#${id}`);
   }
 
-  gsap.fromTo('#turntable', { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 1, ease: 'power3.out' });
-  gsap.fromTo('#track-info', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', delay: 0.15 });
+  if ($('#turntable')) gsap.fromTo('#turntable', { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 1, ease: 'power3.out' });
+  if ($('#track-info')) gsap.fromTo('#track-info', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', delay: 0.15 });
 
   initYouTube();
 }
 
+// Başlatıcı
 init();

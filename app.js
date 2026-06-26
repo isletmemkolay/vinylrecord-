@@ -2,16 +2,34 @@
 
 /* ── Mock database (YouTube video ID veya tam URL) ────────── */
 const playlist = {
-  'hit-001': {
-    song: 'Daha İyi',
+  '8f2c91a4b6d0e3f5': {
+    song: 'Hileli',
     artist: 'Manifest',
-    youtube: 'JiDIJ5CMJw0',
+    youtube: 'kXKhNI4DLHM',
     bg: 'linear-gradient(135deg, #111726 0%, #07090e 100%)',
   },
-  'hit-002': {
-    song: 'Gözlerin Doğuyor Gecelerime',
-    artist: 'Zeki Müren',
-    youtube: '_LK4WaaoWHc',
+  'a7b4e2d9c1f850b6': {
+    song: 'Saki',
+    artist: 'Sıla',
+    youtube: 'y035E2kzLYM',
+    bg: 'linear-gradient(135deg, #2c1a11 0%, #0e0805 100%)',
+  },
+  '3c6e9a1f5b8d2e4b': {
+    song: 'Ölüyorum',
+    artist: 'Hayko Çepkin',
+    youtube: '7QTtOMn5aEI',
+    bg: 'linear-gradient(135deg, #2c1a11 0%, #0e0805 100%)',
+  },
+  'd5f0e8b2a4c793f1': {
+    song: 'Satmışım Anasını',
+    artist: 'Ferdi Özbeğen',
+    youtube: 'cqkQWu1CZl0',
+    bg: 'linear-gradient(135deg, #2c1a11 0%, #0e0805 100%)',
+  },
+  '61b9d4e3f5a2c8e7': {
+    song: 'Sultan Süleyman',
+    artist: 'Sezen Aksu',
+    youtube: '89PepdEhKCM',
     bg: 'linear-gradient(135deg, #2c1a11 0%, #0e0805 100%)',
   },
 };

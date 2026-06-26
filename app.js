@@ -3,9 +3,9 @@
 /* ── Mock database (YouTube video ID veya tam URL) ────────── */
 const playlist = {
   'hit-001': {
-    song: 'Blinding Lights',
-    artist: 'The Weeknd',
-    youtube: '4NRXx6U8ABQ',
+    song: 'Daha İyi',
+    artist: 'Manifest',
+    youtube: 'QUXuAStMbzsHwcq7',
     bg: 'linear-gradient(135deg, #111726 0%, #07090e 100%)',
   },
   'hit-002': {

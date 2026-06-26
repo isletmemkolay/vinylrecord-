@@ -5,7 +5,7 @@ const playlist = {
   'hit-001': {
     song: 'Daha İyi',
     artist: 'Manifest',
-    youtube: JiDIJ5CMJw0',
+    youtube: 'JiDIJ5CMJw0',
     bg: 'linear-gradient(135deg, #111726 0%, #07090e 100%)',
   },
   'hit-002': {
@@ -50,7 +50,7 @@ function parseYoutubeId(input) {
 }
 
 function coverFromYoutube(id) {
-  return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+  return `https://img.youtube.com/vi/${JiDIJ5CMJw0}/hqdefault.jpg`;
 }
 
 function resolveTrackId() {

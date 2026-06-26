@@ -16,7 +16,7 @@ const playlist = {
     cover: 'https://img.youtube.com/vi/_LK4WaaoWHc/maxresdefault.jpg',
     // NOT: HTML5 Audio elementi için doğrudan .mp3 gibi bir kaynak vermelisiniz. 
     // YouTube linkleri doğrudan burada çalışmaz. Örnek bir mp3 koyulmuştur:
-    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', 
+    audio: 'https://youtu.be/_LK4WaaoWHc?si=LxpxDOptAhXQNkN3', 
     bg: 'linear-gradient(135deg, #2c1a11 0%, #0e0805 100%)',
   }
 };

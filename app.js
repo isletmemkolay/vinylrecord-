@@ -9,16 +9,16 @@ const playlist = {
     audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
     bg: 'linear-gradient(135deg, #111726 0%, #07090e 100%)',
   },
-    },
-   'hit-002': {
+  'hit-002': {
     song: 'Gözlerin Doğuyor Gecelerime',
-    artist: '
-Zeki Müren',
-    cover: 'https://img.youtube.com/vi/_LK4WaaoWHc?si=8aN715Yd1K5ikktR/maxresdefault.jpg',
-    audio: 'https://youtu.be/_LK4WaaoWHc?si=8aN715Yd1K5ikktR',
-    bg: 'linear-gradient(135deg, #111726 0%, #07090e 100%)',
-  },
-};
+    artist: 'Zeki Müren',
+    // Doğru YouTube Kapak Resmi URL'i:
+    cover: 'https://img.youtube.com/vi/_LK4WaaoWHc/maxresdefault.jpg',
+    // NOT: HTML5 Audio elementi için doğrudan .mp3 gibi bir kaynak vermelisiniz. 
+    // YouTube linkleri doğrudan burada çalışmaz. Örnek bir mp3 koyulmuştur:
+    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', 
+    bg: 'linear-gradient(135deg, #2c1a11 0%, #0e0805 100%)',
+  }
 };
 
 const DEFAULT_ID = 'hit-001';
@@ -67,7 +67,7 @@ function loadTrack(id) {
   stopPlayback(true);
 
   currentId = id;
-  trackIdEl.textContent = id;
+  if (trackIdEl) trackIdEl.textContent = id;
 
   cover.src = track.cover;
   cover.alt = `${track.song} cover art`;
@@ -134,7 +134,7 @@ function setPlayingUI(playing) {
   playBtn.setAttribute('aria-pressed', String(playing));
   playBtn.setAttribute('aria-label', playing ? 'Stop vinyl' : 'Play vinyl');
   playBtn.classList.toggle('is-playing', playing);
-  btnLabel.textContent = playing ? 'İğneyi Bırak' : 'Play Vinyl';
+  if (btnLabel) btnLabel.textContent = playing ? 'İğneyi Bırak' : 'Play Vinyl';
   vinyl.classList.toggle('spinning', playing);
 }
 
@@ -204,7 +204,7 @@ function init() {
     history.replaceState(null, '', `#${id}`);
   }
 
-  gsap.fromTo(header, { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.15 });
+  if (header) gsap.fromTo(header, { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.15 });
   gsap.fromTo('#turntable', { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 1, ease: 'power3.out', delay: 0.1 });
 }
 

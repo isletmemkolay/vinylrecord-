@@ -5,7 +5,7 @@ const playlist = {
   'hit-001': {
     song: 'Daha İyi',
     artist: 'Manifest',
-    youtube: 'QUXuAStMbzsHwcq7',
+    youtube: JiDIJ5CMJw0',
     bg: 'linear-gradient(135deg, #111726 0%, #07090e 100%)',
   },
   'hit-002': {

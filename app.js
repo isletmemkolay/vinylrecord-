@@ -9,6 +9,16 @@ const playlist = {
     audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
     bg: 'linear-gradient(135deg, #111726 0%, #07090e 100%)',
   },
+    },
+   'hit-002': {
+    song: 'Gözlerin Doğuyor Gecelerime',
+    artist: '
+Zeki Müren',
+    cover: 'https://img.youtube.com/vi/_LK4WaaoWHc?si=8aN715Yd1K5ikktR/maxresdefault.jpg',
+    audio: 'https://youtu.be/_LK4WaaoWHc?si=8aN715Yd1K5ikktR',
+    bg: 'linear-gradient(135deg, #111726 0%, #07090e 100%)',
+  },
+};
 };
 
 const DEFAULT_ID = 'hit-001';

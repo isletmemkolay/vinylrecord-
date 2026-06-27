@@ -36,29 +36,22 @@ const playlist = {
 const DEFAULT_ID = '8f2c91a4b6d0e3f5';
 const TONEARM_REST = -18;
 const TONEARM_PLAY = 25;
-const ARM_DURATION = 1.2;
+const ARM_DURATION = 1.15;
 
 const $ = (sel) => document.querySelector(sel);
-
 const app = $('#app');
 const vinyl = $('#vinyl');
 const tonearm = $('#tonearm-pivot');
 const cover = $('#cover');
 const songTitle = $('#song-title');
 const artistName = $('#artist-name');
+const playerFrame = $('#player-frame');
 
 let currentId = DEFAULT_ID;
 let currentVideoId = null;
 let isPlaying = false;
 let isAnimating = false;
 let armTween = null;
-let ytPlayer = null;
-let ytReady = false;
-let ytScriptLoaded = false;
-let pendingVideoId = null;
-let userInteracted = false;
-let playRequested = false;
-let unlockRequested = false;
 
 function parseYoutubeId(input) {
   if (!input) return null;
@@ -70,6 +63,18 @@ function parseYoutubeId(input) {
 
 function coverFromYoutube(id) {
   return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+}
+
+function embedUrl(videoId, autoplay = false) {
+  const params = new URLSearchParams({
+    playsinline: '1',
+    rel: '0',
+    controls: '1',
+    modestbranding: '1',
+    enablejsapi: '0',
+  });
+  if (autoplay) params.set('autoplay', '1');
+  return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
 }
 
 function resolveTrackId() {
@@ -107,58 +112,24 @@ function animateTonearm(toDeg, onComplete) {
   });
 }
 
-function pauseYoutube() {
-  if (ytReady && ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
-    ytPlayer.pauseVideo();
-  }
+function mountPlayer(autoplay = false) {
+  if (!currentVideoId) return;
+  playerFrame.src = embedUrl(currentVideoId, autoplay);
 }
 
-function tryPlayCurrent() {
-  if (!playRequested || !currentVideoId || !ytReady || !ytPlayer || !userInteracted) return;
-
-  try {
-    if (typeof ytPlayer.loadVideoById === 'function') {
-      ytPlayer.loadVideoById(currentVideoId);
-    } else if (typeof ytPlayer.playVideo === 'function') {
-      ytPlayer.playVideo();
-    }
-  } catch (error) {
-    pendingVideoId = currentVideoId;
-  }
+function unmountPlayer() {
+  playerFrame.src = 'about:blank';
 }
 
-function primePlayback() {
-  userInteracted = true;
-  playRequested = true;
-
-  if (!ytScriptLoaded) {
-    initYouTube();
-  }
-
-  if (ytReady && ytPlayer && currentVideoId) {
-    tryPlayCurrent();
-  } else {
-    pendingVideoId = currentVideoId;
-    unlockRequested = true;
-  }
-}
-
-function loadTrack(id, preservePlayback = false) {
+function loadTrack(id) {
   const track = playlist[id];
   if (!track) return;
 
-  if (ytReady && !preservePlayback) {
-    pauseYoutube();
-    setPlayingUI(false);
-    gsap.set(tonearm, { rotation: TONEARM_REST });
-  }
-
-  const videoId = parseYoutubeId(track.youtube);
   currentId = id;
-  currentVideoId = videoId;
+  currentVideoId = parseYoutubeId(track.youtube);
 
-  if (videoId) {
-    cover.src = coverFromYoutube(videoId);
+  if (currentVideoId) {
+    cover.src = coverFromYoutube(currentVideoId);
     cover.alt = `${track.song} — ${track.artist}`;
   }
 
@@ -167,122 +138,46 @@ function loadTrack(id, preservePlayback = false) {
   app.style.background = track.bg;
   document.title = `${track.song} — ${track.artist}`;
 
-  if (ytReady && ytPlayer && videoId) {
-    if (preservePlayback && isPlaying) {
-      ytPlayer.loadVideoById(videoId);
-    } else {
-      ytPlayer.cueVideoById(videoId);
-    }
-  } else {
-    pendingVideoId = videoId;
-  }
+  mountPlayer(false);
+  setPlayingUI(false);
+  gsap.set(tonearm, { rotation: TONEARM_REST });
 }
 
-function startPlaybackFromGesture() {
-  if (!currentVideoId || isAnimating) return;
+function startPlayback(event) {
+  event.preventDefault();
+  if (!currentVideoId || isAnimating || isPlaying) return;
 
-  primePlayback();
-
+  mountPlayer(true);
   animateTonearm(TONEARM_PLAY, () => {
-    tryPlayCurrent();
+    setPlayingUI(true);
   });
 }
 
-function stopPlayback(instant = false) {
-  if (armTween) armTween.kill();
+function stopPlayback(event) {
+  event.preventDefault();
+  if (isAnimating || !isPlaying) return;
 
-  playRequested = false;
-  unlockRequested = false;
-  pauseYoutube();
+  unmountPlayer();
+  mountPlayer(false);
   setPlayingUI(false);
-
-  if (instant) {
-    gsap.set(tonearm, { rotation: TONEARM_REST });
-    isAnimating = false;
-    return;
-  }
-
   animateTonearm(TONEARM_REST);
 }
 
-function togglePlaybackFromGesture(event) {
-  event.preventDefault();
-
-  if (isAnimating) return;
-
+function togglePlayback(event) {
   if (isPlaying) {
-    stopPlayback();
+    stopPlayback(event);
   } else {
-    startPlaybackFromGesture();
+    startPlayback(event);
   }
 }
 
-function onPlayerReady() {
-  ytReady = true;
-
-  if (pendingVideoId) {
-    ytPlayer.cueVideoById(pendingVideoId);
-  }
-
-  if (unlockRequested && playRequested) {
-    tryPlayCurrent();
-  }
-}
-
-function onPlayerStateChange(event) {
-  if (event.data === YT.PlayerState.PLAYING) {
-    setPlayingUI(true);
-    unlockRequested = false;
-  }
-
-  if (event.data === YT.PlayerState.PAUSED && playRequested) {
-    setPlayingUI(false);
-  }
-
-  if (event.data === YT.PlayerState.ENDED) {
-    stopPlayback();
-  }
-}
-
-function initYouTube() {
-  if (ytScriptLoaded) return;
-  ytScriptLoaded = true;
-
-  window.onYouTubeIframeAPIReady = () => {
-    ytPlayer = new YT.Player('yt-player', {
-      height: '0',
-      width: '0',
-      videoId: currentVideoId || undefined,
-      playerVars: {
-        autoplay: 0,
-        controls: 0,
-        disablekb: 1,
-        fs: 0,
-        iv_load_policy: 3,
-        modestbranding: 1,
-        playsinline: 1,
-        rel: 0,
-      },
-      events: {
-        onReady: onPlayerReady,
-        onStateChange: onPlayerStateChange,
-      },
-    });
-  };
-
-  const tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api';
-  tag.async = true;
-  document.head.appendChild(tag);
-}
-
-['pointerdown', 'touchstart', 'click'].forEach((type) => {
-  tonearm.addEventListener(type, togglePlaybackFromGesture, { passive: false });
+['touchend', 'pointerup', 'click'].forEach((type) => {
+  tonearm.addEventListener(type, togglePlayback, { passive: false });
 });
 
 window.addEventListener('hashchange', () => {
   const id = resolveTrackId();
-  if (id !== currentId) loadTrack(id, isPlaying);
+  if (id !== currentId) loadTrack(id);
 });
 
 function init() {
@@ -296,13 +191,8 @@ function init() {
     history.replaceState(null, '', `#${id}`);
   }
 
-  if ($('#turntable')) {
-    gsap.fromTo('#turntable', { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 1, ease: 'power3.out' });
-  }
-
-  if ($('#track-info')) {
-    gsap.fromTo('#track-info', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', delay: 0.15 });
-  }
+  gsap.fromTo('#turntable', { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 1, ease: 'power3.out' });
+  gsap.fromTo('#track-info', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', delay: 0.15 });
 }
 
 init();

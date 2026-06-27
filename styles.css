@@ -13,10 +13,27 @@
   --accent-glow: rgba(119, 141, 169, 0.14);
 }
 
-*, *::before, *::after { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; overflow: hidden; }
-html { -webkit-tap-highlight-color: transparent; }
-body { background: var(--bg-main); color: var(--text-main); }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--bg-main);
+  color: var(--text-main);
+}
 
 .app-shell {
   width: 100%;
@@ -44,7 +61,7 @@ body { background: var(--bg-main); color: var(--text-main); }
 
 .turntable-base {
   position: relative;
-  width: min(92vw, 92svh - 8rem, 360px);
+  width: min(92vw, calc(92svh - 8rem), 360px);
   aspect-ratio: 1;
   background: var(--panel-main);
   border-radius: 1.25rem;
@@ -101,10 +118,17 @@ body { background: var(--bg-main); color: var(--text-main); }
   transform: translateZ(0);
 }
 
-.vinyl-disc.spinning { animation: spin 1.8s linear infinite; }
+.vinyl-disc.spinning {
+  animation: spin 1.8s linear infinite;
+}
+
 @keyframes spin {
-  from { transform: rotate(0deg) translateZ(0); }
-  to { transform: rotate(360deg) translateZ(0); }
+  from {
+    transform: rotate(0deg) translateZ(0);
+  }
+  to {
+    transform: rotate(360deg) translateZ(0);
+  }
 }
 
 .vinyl-grooves {
@@ -205,10 +229,18 @@ body { background: var(--bg-main); color: var(--text-main); }
   cursor: pointer;
 }
 
-.tonearm-pivot.is-playing .stylus-hit { animation: stylus-glow 2s ease-in-out infinite; }
+.tonearm-pivot.is-playing .stylus-hit {
+  animation: stylus-glow 2s ease-in-out infinite;
+}
+
 @keyframes stylus-glow {
-  0%, 100% { fill: transparent; }
-  50% { fill: var(--accent-glow); }
+  0%,
+  100% {
+    fill: transparent;
+  }
+  50% {
+    fill: var(--accent-glow);
+  }
 }
 
 .track-info {
@@ -236,5 +268,7 @@ body { background: var(--bg-main); color: var(--text-main); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .vinyl-disc.spinning { animation-duration: 3.6s; }
+  .vinyl-disc.spinning {
+    animation-duration: 3.6s;
+  }
 }

@@ -64,8 +64,7 @@ body {
 
 .turntable-base {
   position: relative;
-  width: min(92vw, 360px);
-  max-height: calc(92svh - 8rem);
+  width: min(92vw, 92svh - 8rem, 360px);
   aspect-ratio: 1;
   background: var(--panel-main);
   border-radius: 1.25rem;
@@ -241,6 +240,15 @@ body {
   line-height: 1.3;
   letter-spacing: -0.01em;
   color: var(--text-main);
+}
+
+.yt-player {
+  position: fixed;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {

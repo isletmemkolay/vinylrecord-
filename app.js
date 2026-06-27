@@ -1,38 +1,40 @@
-'use strict';
+
+# Create the final app.js file
+app_js = """'use strict';
 
 const playlist = {
   '8f2c91a4b6d0e3f5': {
     song: 'Hileli',
     artist: 'Manifest',
-    audio: 'https://example.com/audio/hileli.mp3', // Replace with actual audio URL
+    audio: 'https://example.com/audio/hileli.mp3',
     youtube: 'kXKhNI4DLHM',
     bg: 'linear-gradient(135deg, #1B263B 0%, #0D1B2A 100%)'
   },
   'a7b4e2d9c1f850b6': {
     song: 'Saki',
     artist: 'Sıla',
-    audio: 'https://example.com/audio/saki.mp3', // Replace with actual audio URL
+    audio: 'https://example.com/audio/saki.mp3',
     youtube: 'y035E2kzLYM',
     bg: 'linear-gradient(135deg, #27384d 0%, #111927 100%)'
   },
   '3c6e9a1f5b8d2e4b': {
     song: 'Ölüyorum',
     artist: 'Hayko Çepkin',
-    audio: 'https://example.com/audio/oluyorum.mp3', // Replace with actual audio URL
+    audio: 'https://example.com/audio/oluyorum.mp3',
     youtube: 'Coh96WC6Mc4',
     bg: 'linear-gradient(135deg, #223246 0%, #0d1622 100%)'
   },
   'd5f0e8b2a4c793f1': {
     song: 'Satmışım Anasını',
     artist: 'Ferdi Özbeğen',
-    audio: 'https://example.com/audio/satmisim.mp3', // Replace with actual audio URL
+    audio: 'https://example.com/audio/satmisim.mp3',
     youtube: 'cqkQWu1CZl0',
     bg: 'linear-gradient(135deg, #314761 0%, #152132 100%)'
   },
   '61b9d4e3f5a2c8e7': {
     song: 'Sultan Süleyman',
     artist: 'Sezen Aksu',
-    audio: 'https://example.com/audio/sultan.mp3', // Replace with actual audio URL
+    audio: 'https://example.com/audio/sultan.mp3',
     youtube: '89PepdEhKCM',
     bg: 'linear-gradient(135deg, #3a5471 0%, #172131 100%)'
   }
@@ -60,7 +62,7 @@ let isAnimating = false;
 let armTween = null;
 let interactionLock = false;
 
-if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !audioPlayer || !turntable || !trackInfo) {
+if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !audioPlayer) {
   console.error('Eksik DOM elemanı var. index.html içindeki id değerlerini kontrol et.');
 } else {
   function coverFromYoutube(id) {
@@ -108,13 +110,11 @@ if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !audioP
 
     currentId = id;
 
-    // Stop current audio if playing
     audioPlayer.pause();
     audioPlayer.currentTime = 0;
     audioPlayer.src = track.audio || '';
     audioPlayer.load();
 
-    // Cover image from YouTube thumbnail
     if (track.youtube) {
       cover.src = coverFromYoutube(track.youtube);
       cover.alt = `${track.song} — ${track.artist}`;
@@ -138,8 +138,6 @@ if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !audioP
 
     interactionLock = true;
 
-    // CRITICAL: audio.play() must be called DIRECTLY in the user gesture handler
-    // This is why we call it immediately, not after the animation
     const playPromise = audioPlayer.play();
 
     animateTonearm(TONEARM_PLAY, () => {
@@ -149,7 +147,6 @@ if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !audioP
       }, 300);
     });
 
-    // Handle autoplay policy rejections gracefully
     if (playPromise !== undefined) {
       playPromise.catch(err => {
         console.warn('Audio play failed:', err);
@@ -185,10 +182,8 @@ if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !audioP
     }
   }
 
-  // Single event listener - pointerup captures both mouse and touch
   tonearm.addEventListener('pointerup', togglePlayback, { passive: false });
 
-  // When audio ends naturally, reset UI
   audioPlayer.addEventListener('ended', () => {
     setPlayingUI(false);
     gsap.to(tonearm, {
@@ -224,4 +219,9 @@ if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !audioP
   }
 
   init();
-}
+}"""
+
+with open('/mnt/agents/output/app.js', 'w', encoding='utf-8') as f:
+    f.write(app_js)
+
+print("app.js created successfully")

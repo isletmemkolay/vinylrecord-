@@ -29,15 +29,12 @@
   <div id="app" class="app-shell">
     <main class="player-stage">
       <div class="turntable-base" id="turntable">
+        <!-- Native audio element (hidden) -->
+        <audio id="audio-player" preload="none" crossorigin="anonymous"></audio>
+
+        <!-- Visual only - no interactive iframe -->
         <div class="player-hotspot-wrap" aria-hidden="true">
-          <iframe
-            id="player-frame"
-            class="player-frame"
-            title="YouTube player"
-            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-            allowfullscreen
-            tabindex="-1"
-          ></iframe>
+          <div class="player-frame-placeholder"></div>
         </div>
 
         <button

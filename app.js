@@ -17,7 +17,7 @@ const playlist = {
   '3c6e9a1f5b8d2e4b': {
     song: 'Ölüyorum',
     artist: 'Hayko Çepkin',
-    youtube: '7QTtOMn5aEI',
+    youtube: 'Coh96WC6Mc4',
     bg: 'linear-gradient(135deg, #2c1a11 0%, #0e0805 100%)',
   },
   'd5f0e8b2a4c793f1': {

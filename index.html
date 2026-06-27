@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#07090e">
+  <meta name="theme-color" content="#1B263B">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>Pikap</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -27,6 +27,17 @@
   <div id="app" class="app-shell">
     <main class="player-stage">
       <div class="turntable-base" id="turntable">
+        <div class="player-hotspot-wrap" aria-hidden="true">
+          <iframe
+            id="player-frame"
+            class="player-frame"
+            title="YouTube player"
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allowfullscreen
+            tabindex="-1"
+          ></iframe>
+        </div>
+
         <button
           type="button"
           class="tonearm-pivot"
@@ -72,8 +83,6 @@
       </div>
     </main>
   </div>
-
-  <div id="yt-player" class="yt-player" aria-hidden="true"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="app.js"></script>

@@ -276,7 +276,9 @@ function initYouTube() {
   document.head.appendChild(tag);
 }
 
-tonearm.addEventListener('pointerup', togglePlaybackFromGesture, { passive: false });
+['pointerdown', 'touchstart', 'click'].forEach((type) => {
+  tonearm.addEventListener(type, togglePlaybackFromGesture, { passive: false });
+});
 
 window.addEventListener('hashchange', () => {
   const id = resolveTrackId();

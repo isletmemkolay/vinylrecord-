@@ -60,7 +60,7 @@ let isAnimating = false;
 let armTween = null;
 let interactionLock = false;
 
-if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !audioPlayer) {
+if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !audioPlayer || !turntable || !trackInfo) {
   console.error('Eksik DOM elemanı var. index.html içindeki id değerlerini kontrol et.');
 } else {
   function coverFromYoutube(id) {

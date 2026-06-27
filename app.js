@@ -4,30 +4,35 @@ const playlist = {
   '8f2c91a4b6d0e3f5': {
     song: 'Hileli',
     artist: 'Manifest',
+    audio: 'https://example.com/audio/hileli.mp3', // Replace with actual audio URL
     youtube: 'kXKhNI4DLHM',
     bg: 'linear-gradient(135deg, #1B263B 0%, #0D1B2A 100%)'
   },
   'a7b4e2d9c1f850b6': {
     song: 'Saki',
     artist: 'Sıla',
+    audio: 'https://example.com/audio/saki.mp3', // Replace with actual audio URL
     youtube: 'y035E2kzLYM',
     bg: 'linear-gradient(135deg, #27384d 0%, #111927 100%)'
   },
   '3c6e9a1f5b8d2e4b': {
     song: 'Ölüyorum',
     artist: 'Hayko Çepkin',
+    audio: 'https://example.com/audio/oluyorum.mp3', // Replace with actual audio URL
     youtube: 'Coh96WC6Mc4',
     bg: 'linear-gradient(135deg, #223246 0%, #0d1622 100%)'
   },
   'd5f0e8b2a4c793f1': {
     song: 'Satmışım Anasını',
     artist: 'Ferdi Özbeğen',
+    audio: 'https://example.com/audio/satmisim.mp3', // Replace with actual audio URL
     youtube: 'cqkQWu1CZl0',
     bg: 'linear-gradient(135deg, #314761 0%, #152132 100%)'
   },
   '61b9d4e3f5a2c8e7': {
     song: 'Sultan Süleyman',
     artist: 'Sezen Aksu',
+    audio: 'https://example.com/audio/sultan.mp3', // Replace with actual audio URL
     youtube: '89PepdEhKCM',
     bg: 'linear-gradient(135deg, #3a5471 0%, #172131 100%)'
   }
@@ -45,41 +50,21 @@ const tonearm = $('#tonearm-pivot');
 const cover = $('#cover');
 const songTitle = $('#song-title');
 const artistName = $('#artist-name');
-const playerFrame = $('#player-frame');
 const turntable = $('#turntable');
 const trackInfo = $('#track-info');
+const audioPlayer = $('#audio-player');
 
 let currentId = DEFAULT_ID;
-let currentVideoId = null;
 let isPlaying = false;
 let isAnimating = false;
 let armTween = null;
 let interactionLock = false;
 
-if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !playerFrame) {
+if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !audioPlayer) {
   console.error('Eksik DOM elemanı var. index.html içindeki id değerlerini kontrol et.');
 } else {
-  function parseYoutubeId(input) {
-    if (!input) return null;
-    const trimmed = input.trim();
-    if (/^[\w-]{11}$/.test(trimmed)) return trimmed;
-    const match = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|img\.youtube\.com\/vi\/)([\w-]{11})/);
-    return match ? match[1] : null;
-  }
-
   function coverFromYoutube(id) {
     return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
-  }
-
-  function embedUrl(videoId, autoplay = false) {
-    const params = new URLSearchParams({
-      autoplay: autoplay ? '1' : '0',
-      playsinline: '1',
-      rel: '0',
-      controls: '1',
-      modestbranding: '1'
-    });
-    return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
   }
 
   function resolveTrackId() {
@@ -117,27 +102,21 @@ if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !player
     });
   }
 
-  function mountPlayer(autoplay = false) {
-    if (!currentVideoId) return;
-    const nextSrc = embedUrl(currentVideoId, autoplay);
-    if (playerFrame.src !== nextSrc) {
-      playerFrame.src = nextSrc;
-    }
-  }
-
-  function unmountPlayer() {
-    playerFrame.src = 'about:blank';
-  }
-
   function loadTrack(id) {
     const track = playlist[id];
     if (!track) return;
 
     currentId = id;
-    currentVideoId = parseYoutubeId(track.youtube);
 
-    if (currentVideoId) {
-      cover.src = coverFromYoutube(currentVideoId);
+    // Stop current audio if playing
+    audioPlayer.pause();
+    audioPlayer.currentTime = 0;
+    audioPlayer.src = track.audio || '';
+    audioPlayer.load();
+
+    // Cover image from YouTube thumbnail
+    if (track.youtube) {
+      cover.src = coverFromYoutube(track.youtube);
       cover.alt = `${track.song} — ${track.artist}`;
     }
 
@@ -146,23 +125,40 @@ if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !player
     app.style.background = track.bg;
     document.title = `${track.song} — ${track.artist}`;
 
-    mountPlayer(false);
     setPlayingUI(false);
     gsap.set(tonearm, { rotation: TONEARM_REST });
   }
 
   function startPlayback(event) {
     if (event) event.preventDefault();
-    if (!currentVideoId || isAnimating || isPlaying || interactionLock) return;
+    if (isAnimating || isPlaying || interactionLock) return;
+
+    const track = playlist[currentId];
+    if (!track || !track.audio) return;
 
     interactionLock = true;
-    mountPlayer(true);
+
+    // CRITICAL: audio.play() must be called DIRECTLY in the user gesture handler
+    // This is why we call it immediately, not after the animation
+    const playPromise = audioPlayer.play();
+
     animateTonearm(TONEARM_PLAY, () => {
       setPlayingUI(true);
       setTimeout(() => {
         interactionLock = false;
       }, 300);
     });
+
+    // Handle autoplay policy rejections gracefully
+    if (playPromise !== undefined) {
+      playPromise.catch(err => {
+        console.warn('Audio play failed:', err);
+        setPlayingUI(false);
+        animateTonearm(TONEARM_REST, () => {
+          interactionLock = false;
+        });
+      });
+    }
   }
 
   function stopPlayback(event) {
@@ -170,8 +166,9 @@ if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !player
     if (isAnimating || !isPlaying || interactionLock) return;
 
     interactionLock = true;
-    unmountPlayer();
-    mountPlayer(false);
+    audioPlayer.pause();
+    audioPlayer.currentTime = 0;
+
     setPlayingUI(false);
     animateTonearm(TONEARM_REST, () => {
       setTimeout(() => {
@@ -188,7 +185,18 @@ if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !player
     }
   }
 
+  // Single event listener - pointerup captures both mouse and touch
   tonearm.addEventListener('pointerup', togglePlayback, { passive: false });
+
+  // When audio ends naturally, reset UI
+  audioPlayer.addEventListener('ended', () => {
+    setPlayingUI(false);
+    gsap.to(tonearm, {
+      rotation: TONEARM_REST,
+      duration: ARM_DURATION,
+      ease: 'power2.inOut'
+    });
+  });
 
   window.addEventListener('hashchange', () => {
     const id = resolveTrackId();

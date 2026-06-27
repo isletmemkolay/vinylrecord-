@@ -1,13 +1,16 @@
+/* ── Base ─────────────────────────────────────────────────── */
 :root {
   --rich-black: #0D1B2A;
   --oxford-blue: #1B263B;
   --yinmn-blue: #415A77;
   --silver-lake-blue: #778DA9;
   --platinum: #E5E7E6;
+
   --bg-main: linear-gradient(135deg, #1B263B 0%, #0D1B2A 100%);
   --panel-main: linear-gradient(145deg, #5B7695 0%, #415A77 42%, #2A3B52 100%);
   --ring-main: radial-gradient(circle at 50% 45%, #9AAECC 0%, #778DA9 28%, #415A77 58%, #1B263B 82%, #0D1B2A 100%);
   --vinyl-base: radial-gradient(circle at 50% 50%, #1A1A1A 0%, #0A0A0A 55%, #050505 100%);
+
   --text-main: #E5E7E6;
   --text-faint: rgba(229, 231, 230, 0.48);
   --accent-glow: rgba(119, 141, 169, 0.14);
@@ -62,8 +65,7 @@ body {
 .turntable-base {
   position: relative;
   width: min(92vw, 360px);
-  max-width: 360px;
-  max-height: min(92vw, 360px);
+  max-height: calc(92svh - 8rem);
   aspect-ratio: 1;
   background: var(--panel-main);
   border-radius: 1.25rem;
@@ -102,12 +104,8 @@ body {
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg) translateZ(0);
-  }
-  to {
-    transform: rotate(360deg) translateZ(0);
-  }
+  from { transform: rotate(0deg) translateZ(0); }
+  to { transform: rotate(360deg) translateZ(0); }
 }
 
 .vinyl-grooves {
@@ -197,6 +195,10 @@ body {
   border-radius: 4px;
 }
 
+.tonearm-pivot:disabled {
+  pointer-events: none;
+}
+
 .tonearm-svg {
   display: block;
   width: clamp(56px, 18vw, 72px);
@@ -213,13 +215,8 @@ body {
 }
 
 @keyframes stylus-glow {
-  0%,
-  100% {
-    fill: transparent;
-  }
-  50% {
-    fill: var(--accent-glow);
-  }
+  0%, 100% { fill: transparent; }
+  50% { fill: var(--accent-glow); }
 }
 
 .track-info {

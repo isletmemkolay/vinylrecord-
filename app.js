@@ -1,5 +1,5 @@
 
-# Create the final app.js file
+# Create the final app.js file with pointerdown + pointerup fix
 app_js = """'use strict';
 
 const playlist = {
@@ -70,7 +70,7 @@ if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !audioP
   }
 
   function resolveTrackId() {
-    const hash = location.hash.replace(/^#\/?/, '').trim();
+    const hash = location.hash.replace(/^#\\/?/, '').trim();
     if (hash && playlist[hash]) return hash;
 
     const params = new URLSearchParams(location.search);
@@ -182,6 +182,7 @@ if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !audioP
     }
   }
 
+  tonearm.addEventListener('pointerdown', (e) => { e.preventDefault(); }, { passive: false });
   tonearm.addEventListener('pointerup', togglePlayback, { passive: false });
 
   audioPlayer.addEventListener('ended', () => {
@@ -224,4 +225,4 @@ if (!app || !vinyl || !tonearm || !cover || !songTitle || !artistName || !audioP
 with open('/mnt/agents/output/app.js', 'w', encoding='utf-8') as f:
     f.write(app_js)
 
-print("app.js created successfully")
+print("app.js created")
